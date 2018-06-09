@@ -22,6 +22,7 @@ use Instagram\API\Request\InfoMediaRequest;
 use Instagram\API\Request\InfoUserRequest;
 use Instagram\API\Request\LikedFeedRequest;
 use Instagram\API\Request\LikeMediaRequest;
+use Instagram\API\Request\LikesMediaRequest;
 use Instagram\API\Request\LocationFeedRequest;
 use Instagram\API\Request\LoginRequest;
 use Instagram\API\Request\LogoutRequest;
@@ -686,6 +687,35 @@ class Instagram {
 
         if(!$response->isOk()){
             throw new InstagramException(sprintf("Failed to likeMedia: [%s] %s", $response->getStatus(), $response->getMessage()));
+        }
+
+        return $response;
+
+    }
+
+    /**
+     *
+     * Get Media Likes
+     *
+     * @param string|API\Response\Model\FeedItem $mediaId FeedItem or FeedItem Id of Media to get Comments from
+     * @return API\Response\LikesMediaResponse
+     * @throws Exception
+     */
+    public function getMediaLikes($mediaId){
+
+        if(!$this->isLoggedIn()){
+            throw new InstagramException("You must be logged in to call getMediaComments().");
+        }
+
+        if($mediaId instanceof FeedItem){
+            $mediaId = $mediaId->getPk();
+        }
+
+        $request = new LikesMediaRequest($this, $mediaId);
+        $response = $request->execute();
+
+        if(!$response->isOk()){
+            throw new InstagramException(sprintf("Failed to getMediaLikes: [%s] %s", $response->getStatus(), $response->getMessage()));
         }
 
         return $response;
