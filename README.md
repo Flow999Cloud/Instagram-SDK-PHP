@@ -47,17 +47,6 @@ Examples can be seen in the [examples](./examples) folder.
 
 ## Usage
 
-### Config
-
-Default configuration can be overridden by passing an array into the Instagram class constructor
-
-```php
-$instagram = new Instagram([
-    Instagram::CONFIG_TIMEZONE => "Pacific/Auckland",
-    Instagram::CONFIG_TIMEZONE_OFFSET => 43200
-]);
-```
-
 ### Login
 
 Read: [Session Management](#session-management), to avoid calling `login` in each script.
@@ -124,6 +113,14 @@ $instagram->getLocationFeed($locationId, $maxId);
 
 ```php
 $instagram->getUserTagsFeed($userId, $maxId);
+```
+
+### Get Media Likers
+
+- `$mediaId`:`string|FeedItem` FeedItem or FeedItem Id of Media to get Likers from
+
+```php
+$instagram->getMediaLikes($mediaId);
 ```
 
 ### Like Media
