@@ -126,6 +126,14 @@ $instagram->getLocationFeed($locationId, $maxId);
 $instagram->getUserTagsFeed($userId, $maxId);
 ```
 
+### Get Media Likers
+
+- `$mediaId`:`string|FeedItem` FeedItem or FeedItem Id of Media to get Likers from
+
+```php
+$instagram->getMediaLikes($mediaId);
+```
+
 ### Like Media
 
 - `$mediaId`:`string|FeedItem` FeedItem or FeedItem Id to Like
