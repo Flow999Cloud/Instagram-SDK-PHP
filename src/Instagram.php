@@ -3,6 +3,7 @@
 namespace Instagram;
 
 use Exception;
+use Instagram\API\Constants;
 use Instagram\API\Framework\InstagramException;
 use Instagram\API\Request\BlockFriendshipRequest;
 use Instagram\API\Request\BulkDeleteCommentsMediaRequest;
@@ -24,6 +25,12 @@ use Instagram\API\Request\LikedFeedRequest;
 use Instagram\API\Request\LikeMediaRequest;
 use Instagram\API\Request\LocationFeedRequest;
 use Instagram\API\Request\LoginRequest;
+use Instagram\API\Request\ChallengeRequest;
+use Instagram\API\Request\ChallengeMethods;
+use Instagram\API\Request\Challenge_sendcode;
+use Instagram\API\Request\Challenge_confirm_code;
+use Instagram\API\Request\Challenge_sendcode_again;
+use Instagram\API\Request\SaveSession;
 use Instagram\API\Request\LogoutRequest;
 use Instagram\API\Request\PhotoUploadRequest;
 use Instagram\API\Request\PlacesFacebookSearchRequest;
@@ -472,7 +479,9 @@ class Instagram {
         if(!$response->isOk()){
 
             if($response->isCheckpointRequired()){
-                throw new InstagramException(sprintf("Login Failed: [%s] %s\nGo to this URL in your web browser to continue:\n%s", $response->getStatus(), $response->getMessage(), $response->getCheckpointUrl()));
+                /*$this->sendVerificationCode($response->getCheckpointUrl());*/
+                /*throw new InstagramException(sprintf("Login Failed: [%s] %s\nGo to this URL in your web browser to continue:\n%s", $response->getStatus(), $response->getMessage(), $response->getCheckpointUrl()));*/
+                return array("code" => 201, "url" => $response->getCheckpointUrl());
             }
 
             throw new InstagramException(sprintf("Login Failed: [%s] %s", $response->getStatus(), $response->getMessage()));
@@ -1515,6 +1524,37 @@ class Instagram {
         $request = new LogoutRequest($this);
         return $request->execute();
 
+    }
+
+    public function ChallengeCode($url){
+      $request = new ChallengeRequest($this, $url);
+      return $request->execute();
+    }
+
+    public function GetChallengeMethods($url){
+      $request = new ChallengeMethods($this, $url);
+      return $request->execute();
+    }
+
+    public function sendVerificationCode($url, $method){
+      $request = new Challenge_sendcode($this, $url, $method);
+      return $request->execute();
+    }
+
+    public function ConfirmVerificationCode($url, $code){
+      $request = new Challenge_confirm_code($this, $url, $code);
+      return $request->execute();
+    }
+
+    public function SendVerificationCodeAgain($url, $replay){
+      $request = new Challenge_sendcode_again($this, $url, $replay);
+      return $request->execute();
+    }
+
+
+    public function GetSession($url){
+      $request = new SaveSession($this, $url);
+      return $request->execute();
     }
 
 }
