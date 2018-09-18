@@ -177,61 +177,68 @@ abstract class Request {
         $data = null;
         $curl = new Curl();
 
-        $curl->setOpt(CURLOPT_SSL_VERIFYPEER, $this->verifyPeer);
+        try {
 
-        if($this->proxy != null){
+            $curl->setOpt(CURLOPT_SSL_VERIFYPEER, $this->verifyPeer);
 
-            $curl->setOpt(CURLOPT_PROXY, $this->proxy);
+            if($this->proxy != null){
 
-            if($this->proxyCredentials != null){
-                $curl->setOpt(CURLOPT_PROXYUSERPWD, $this->proxyCredentials);
-            }
+                $curl->setOpt(CURLOPT_PROXY, $this->proxy);
 
-        }
-
-        foreach($this->getHeaders() as $key => $value){
-            $curl->setHeader($key, $value);
-        }
-
-        foreach($this->getCookies() as $key => $value){
-            $curl->setCookie($key, $value);
-        }
-
-        $error_format = "Instagram Request failed: [%s] [%s] %s";
-
-        switch($this->getMethod()){
-
-            case self::GET: {
-
-                $data = $curl->get($this->getUrl(), $this->getParams());
-
-                if($curl->curlError){
-                    throw new InstagramException(sprintf($error_format, "GET", $this->getUrl(), $curl->errorMessage));
+                if($this->proxyCredentials != null){
+                    $curl->setOpt(CURLOPT_PROXYUSERPWD, $this->proxyCredentials);
                 }
 
-                break;
-
             }
 
-            case self::POST: {
+            foreach($this->getHeaders() as $key => $value){
+                $curl->setHeader($key, $value);
+            }
 
-                $data = $curl->post($this->getUrl(), $this->getParams());
+            foreach($this->getCookies() as $key => $value){
+                $curl->setCookie($key, $value);
+            }
 
-                if($curl->curlError){
-                    throw new InstagramException(sprintf($error_format, "POST", $this->getUrl(), $curl->errorMessage));
+            $error_format = "Instagram Request failed: [%s] [%s] %s (Code %s)";
+
+            switch($this->getMethod()){
+
+                case self::GET: {
+
+                    $data = $curl->get($this->getUrl(), $this->getParams());
+
+                    if($curl->curlError){
+                        throw new InstagramException(sprintf($error_format, "GET", $this->getUrl(), $curl->errorMessage, $curl->errorCode));
+                    }
+
+                    break;
+
                 }
 
-                break;
+                case self::POST: {
+
+                    $data = $curl->post($this->getUrl(), $this->getParams());
+
+                    if($curl->curlError){
+                        throw new InstagramException(sprintf($error_format, "POST", $this->getUrl(), $curl->errorMessage, $curl->errorCode));
+                    }
+
+                    break;
+
+                }
+
+                default: {
+                    throw new InstagramException(sprintf($error_format, "UNKNOWN", $this->getUrl(), "Unsupported Request Method", "0"));
+                }
 
             }
 
-            default: {
-                throw new InstagramException(sprintf($error_format, "UNKNOWN", $this->getUrl(), "Unsupported Request Method"));
-            }
+            return new Response($curl, $data);
 
+        } finally {
+            //Release cURL resources after return or exception
+            $curl->close();
         }
-
-        return new Response($curl, $data);
 
     }
 
