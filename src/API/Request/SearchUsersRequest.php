@@ -18,7 +18,7 @@ class SearchUsersRequest extends AuthenticatedBaseRequest {
 
         parent::__construct($instagram);
 
-        $this->addParam("timezone_offset", $instagram->config[Instagram::CONFIG_TIMEZONE_OFFSET]);
+        $this->addParam("timezone_offset", Constants::TIMEZONE_OFFSET);
         $this->addParam("q", $query);
         $this->addParam("count", "50");
         $this->addParam("rank_token", $instagram->getUserRankToken());

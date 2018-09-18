@@ -15,7 +15,7 @@ class PlacesFacebookSearchRequest extends AuthenticatedBaseRequest {
 
         parent::__construct($instagram);
 
-        $this->addParam("timezone_offset", $instagram->config[Instagram::CONFIG_TIMEZONE_OFFSET]);
+        $this->addParam("timezone_offset", Constants::TIMEZONE_OFFSET);
         $this->addParam("count", "50");
 
     }

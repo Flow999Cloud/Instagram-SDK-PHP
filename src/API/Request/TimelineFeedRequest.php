@@ -17,7 +17,7 @@ class TimelineFeedRequest extends AuthenticatedBaseRequest {
         parent::__construct($instagram);
 
         $this->addParam("phone_id", $instagram->getPhoneId());
-        $this->addParam("timezone_offset", $instagram->config[Instagram::CONFIG_TIMEZONE_OFFSET]);
+        $this->addParam("timezone_offset", Constants::TIMEZONE_OFFSET);
         $this->addHeader("X-Google-AD-ID", $instagram->getGoogleAdId());
 
         if(!empty($maxId)) {
