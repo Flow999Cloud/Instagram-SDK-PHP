@@ -34,4 +34,13 @@ class DeviceConstants {
      */
     const ANDROID_RELEASE = "6.0.1";
 
+    /*
+     * Battery Level
+     */
+    const BATTERY_LEVEL = "100";
+
+    /*
+     * Battery Charging
+     */
+    const BATTERY_CHARGING = "0";
 }

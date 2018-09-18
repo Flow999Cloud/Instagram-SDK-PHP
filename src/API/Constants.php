@@ -12,12 +12,12 @@ class Constants {
     /*
      * User Agent for API Requests
      */
-    const USER_AGENT = "Instagram 8.0.0 Android (23/6.0.1; 640dpi; 1440x2560; samsung; SM-G935F; hero2lte; samsungexynos8890; en_NZ)";
+    const USER_AGENT = "Instagram 9.2.0 Android (23/6.0.1; 640dpi; 1440x2560; samsung; SM-G935F; hero2lte; samsungexynos8890; en_NZ)";
 
     /*
 	 * Key used to generate JSON Signatures
 	 */
-    const IG_SIGNATURE_KEY = "9b3b9e55988c954e51477da115c58ae82dcae7ac01c735b4443a3c5923cb593a";
+    const IG_SIGNATURE_KEY = "012a54f51c49aa8c5c322416ab1410909add32c966bbaa0fe3dc58ac43fd7ede";
 
     /*
      * Version of the Signature Key
@@ -28,6 +28,12 @@ class Constants {
      * Connection Type
      */
     const IG_CAPABILITIES = "3Q==";
+
+    /*
+     * Installed Apps
+     * Value: { "1": 0, "2": 0 }
+     */
+    const IG_INSTALLED_APPS = "eyIxIjowLCIyIjowfQ==";
 
     /*
      * Connection Type

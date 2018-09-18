@@ -23,8 +23,15 @@ use Instagram\API\Request\InfoMediaRequest;
 use Instagram\API\Request\InfoUserRequest;
 use Instagram\API\Request\LikedFeedRequest;
 use Instagram\API\Request\LikeMediaRequest;
+use Instagram\API\Request\LikesMediaRequest;
 use Instagram\API\Request\LocationFeedRequest;
 use Instagram\API\Request\LoginRequest;
+use Instagram\API\Request\ChallengeRequest;
+use Instagram\API\Request\ChallengeMethods;
+use Instagram\API\Request\Challenge_sendcode;
+use Instagram\API\Request\Challenge_confirm_code;
+use Instagram\API\Request\Challenge_sendcode_again;
+use Instagram\API\Request\SaveSession;
 use Instagram\API\Request\LogoutRequest;
 use Instagram\API\Request\PhotoUploadRequest;
 use Instagram\API\Request\PlacesFacebookSearchRequest;
@@ -47,6 +54,9 @@ use Instagram\API\Response\Model\User;
 use Ramsey\Uuid\Uuid;
 
 class Instagram {
+
+    const CONFIG_TIMEZONE = "timezone";
+    const CONFIG_TIMEZONE_OFFSET = "timezone_offset";
 
     /**
      *
@@ -138,10 +148,36 @@ class Instagram {
      */
     private $verifyPeer = true;
 
-    public function __construct(){
+    /**
+     * Configuration
+     * @var array
+     */
+    public $config;
+
+    /**
+     * @param array $config Configuration
+     */
+    public function __construct(array $config = []){
+
+        $this->setConfig($config);
 
         //Set your Timezone
-        date_default_timezone_set(Constants::TIMEZONE);
+        date_default_timezone_set($this->config[self::CONFIG_TIMEZONE]);
+
+    }
+
+    /**
+     * Configures the default options
+     * @param array $config
+     */
+    private function setConfig(array $config){
+
+        $defaults = [
+            self::CONFIG_TIMEZONE => "Pacific/Auckland",
+            self::CONFIG_TIMEZONE_OFFSET => "43200"
+        ];
+
+        $this->config = array_merge($defaults, $config);
 
     }
 
@@ -444,7 +480,9 @@ class Instagram {
         if(!$response->isOk()){
 
             if($response->isCheckpointRequired()){
-                throw new InstagramException(sprintf("Login Failed: [%s] %s\nGo to this URL in your web browser to continue:\n%s", $response->getStatus(), $response->getMessage(), $response->getCheckpointUrl()));
+                /*$this->sendVerificationCode($response->getCheckpointUrl());*/
+                /*throw new InstagramException(sprintf("Login Failed: [%s] %s\nGo to this URL in your web browser to continue:\n%s", $response->getStatus(), $response->getMessage(), $response->getCheckpointUrl()));*/
+                return array("code" => 201, "url" => $response->getCheckpointUrl());
             }
 
             throw new InstagramException(sprintf("Login Failed: [%s] %s", $response->getStatus(), $response->getMessage()));
@@ -658,6 +696,35 @@ class Instagram {
 
         if(!$response->isOk()){
             throw new InstagramException(sprintf("Failed to likeMedia: [%s] %s", $response->getStatus(), $response->getMessage()));
+        }
+
+        return $response;
+
+    }
+
+    /**
+     *
+     * Get Media Likes
+     *
+     * @param string|API\Response\Model\FeedItem $mediaId FeedItem or FeedItem Id of Media to get Comments from
+     * @return API\Response\LikesMediaResponse
+     * @throws Exception
+     */
+    public function getMediaLikes($mediaId){
+
+        if(!$this->isLoggedIn()){
+            throw new InstagramException("You must be logged in to call getMediaComments().");
+        }
+
+        if($mediaId instanceof FeedItem){
+            $mediaId = $mediaId->getPk();
+        }
+
+        $request = new LikesMediaRequest($this, $mediaId);
+        $response = $request->execute();
+
+        if(!$response->isOk()){
+            throw new InstagramException(sprintf("Failed to getMediaLikes: [%s] %s", $response->getStatus(), $response->getMessage()));
         }
 
         return $response;
@@ -1487,6 +1554,37 @@ class Instagram {
         $request = new LogoutRequest($this);
         return $request->execute();
 
+    }
+
+    public function ChallengeCode($url){
+      $request = new ChallengeRequest($this, $url);
+      return $request->execute();
+    }
+
+    public function GetChallengeMethods($url){
+      $request = new ChallengeMethods($this, $url);
+      return $request->execute();
+    }
+
+    public function sendVerificationCode($url, $method){
+      $request = new Challenge_sendcode($this, $url, $method);
+      return $request->execute();
+    }
+
+    public function ConfirmVerificationCode($url, $code){
+      $request = new Challenge_confirm_code($this, $url, $code);
+      return $request->execute();
+    }
+
+    public function SendVerificationCodeAgain($url, $replay){
+      $request = new Challenge_sendcode_again($this, $url, $replay);
+      return $request->execute();
+    }
+
+
+    public function GetSession($url){
+      $request = new SaveSession($this, $url);
+      return $request->execute();
     }
 
 }

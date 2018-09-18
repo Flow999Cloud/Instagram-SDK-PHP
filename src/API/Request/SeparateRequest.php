@@ -8,7 +8,7 @@ use Instagram\API\Framework\Request;
 use Instagram\API\Framework\Response;
 use Instagram\Instagram;
 
-abstract class BaseRequest extends Request {
+abstract class SeparateRequest extends Request {
 
     /**
      * @var Instagram
@@ -18,7 +18,7 @@ abstract class BaseRequest extends Request {
     /**
      * @var Response The Response Object
      */
-    private $response;
+    public $response;
 
     public $challengeUrl;
 
@@ -31,13 +31,16 @@ abstract class BaseRequest extends Request {
 
         $this->challengeUrl = $url;
 
-        //$this->addHeader("Accept-Encoding", Constants::ACCEPT_ENCODING);
+        //dd(Constants::ACCEPT_LANGUAGE);
+
         $this->addHeader("Accept-Language", Constants::ACCEPT_LANGUAGE);
 
         $this->addHeader("X-IG-Capabilities", Constants::IG_CAPABILITIES);
         $this->addHeader("X-IG-Connection-Type", Constants::IG_CONNECTION_TYPE);
 
         $this->addHeader("User-Agent", Constants::USER_AGENT);
+
+        //$this->addHeader("User-Agent", 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.140 Safari/537.36');
 
         $this->setInstagram($instagram);
         $this->setProxy($instagram->getProxy());
@@ -77,12 +80,11 @@ abstract class BaseRequest extends Request {
     public abstract function getResponseObject();
 
     public function getUrl(){
-        if($this->challengeUrl != null) return $this->challengeUrl;
-        return Constants::BASE_URL . $this->getEndpoint();
+        return $this->challengeUrl;
     }
 
     public function parseResponse(){
-        return true;
+        return false;
     }
 
     /**
@@ -114,21 +116,19 @@ abstract class BaseRequest extends Request {
         $response = parent::execute();
         $this->response = $response;
 
-        if($this->interceptResponse($response)){
-            return null;
-        }
-
-        if($this->throwExceptionIfResponseNotOk() && !$response->isOK() && !$response->isJson()){
-            throw new InstagramException(sprintf("Instagram Request Failed! [%s] [%s]", $this->getEndpoint(), $response->getCode()));
-        }
-
         $this->instagram->setCookies(array_merge($this->instagram->getCookies(), $response->getCookies()));
 
-        if($this->parseResponse()){
-            return $this->mapper->map($response->getData(), $this->getResponseObject());
+        return $response->getData();
+
+        if($response->isOK() && $response->isJson()){
+          if($this->parseResponse()){
+              return $this->mapper->map($response->getData(), $this->getResponseObject());
+          }
+        }else{
+          return $response->getData();
         }
 
-        return $response->getData();
+        //dd($this->instagram->getCookies());
 
     }
 
