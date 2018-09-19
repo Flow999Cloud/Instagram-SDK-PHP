@@ -1,5 +1,5 @@
 {
-  "name": "liamcottle/instagram-sdk-php",
+  "name": "bloolight/instagram-sdk-php",
   "type": "library",
   "description": "This is an unofficial SDK for the Instagram Private API in PHP",
   "license": "MIT",
@@ -11,14 +11,14 @@
     "SDK"
   ],
   "support": {
-    "issues": "https://github.com/liamcottle/Instagram-SDK-PHP/issues",
-    "wiki": "https://github.com/liamcottle/Instagram-SDK-PHP/wiki",
-    "source": "https://github.com/liamcottle/Instagram-SDK-PHP"
+    "issues": "https://github.com/bloolight/Instagram-SDK-PHP/issues",
+    "wiki": "https://github.com/bloolight/Instagram-SDK-PHP/wiki",
+    "source": "https://github.com/bloolight/Instagram-SDK-PHP"
   },
   "authors": [
     {
-      "name": "Liam Cottle",
-      "email": "liam@liamcottle.com"
+      "name": "Bloo Light",
+      "email": "bloolight@protonmail.com"
     }
   ],
   "autoload": {
